@@ -1,4 +1,4 @@
-// This header file contains all DFT functions
+// This header file contains fast Fourier transform functions
 
 #pragma once
 
@@ -9,7 +9,7 @@
 
 #define comp(a, b) std::complex<long double>(a, b)
 
-namespace dft {
+namespace fft {
 
 namespace details {
 constexpr const long double PI = 3.14159265358979323846264338327950288419716939937510L;
@@ -17,19 +17,6 @@ constexpr const long double PI = 3.141592653589793238462643383279502884197169399
 // Swaps real & imaginary parts of every value in the input vector
 void flip_all(std::vector<std::complex<long double>>& input) {
     std::transform(input.begin(), input.end(), input.begin(), [](auto val) { return comp(val.imag(), val.real()); });
-}
-
-void naive_dft(std::vector<std::complex<long double>>& input, uint32_t size, uint32_t offset=0, uint32_t step=1) {
-
-    std::vector<std::complex<long double>> output(size, comp(0, 0));
-
-    for (int bin = 0; bin < size; bin++) {
-        for (int sample = 0; sample < size; sample++) {
-            output[bin] += input[offset + sample * step] * std::exp(comp(0.0, -1.0) * comp(2.0 * details::PI * bin * sample / size, 0.0));
-        }
-    }
-    // Clone the result to the input vector
-    for (int i = 0; i < size; i++) input[offset + i * step] = output[i];
 }
 
 void radix2fft_rec(std::vector<std::complex<long double>>& input, uint32_t size, uint32_t offset=0, uint32_t step=1) {
@@ -41,6 +28,7 @@ void radix2fft_rec(std::vector<std::complex<long double>>& input, uint32_t size,
 
     // Else calculate the two halves recursively
     // and combine the calculated serieses into one
+    // (If size == 1, there is no need for calculations)
     if (size > 2) {
         radix2fft_rec(input, size/2, offset, step*2);
         radix2fft_rec(input, size/2, offset+step, step*2);
