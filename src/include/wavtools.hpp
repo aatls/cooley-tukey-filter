@@ -82,4 +82,4 @@ int write_wav(const char* filename, wav_hdr* header, char* data)
     fclose(outfile);
     return 0;
 }
-} // namespace oma
+} // namespace watools
