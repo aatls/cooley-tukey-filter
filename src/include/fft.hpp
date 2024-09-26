@@ -35,7 +35,6 @@ void radix2fft_rec(std::vector<std::complex<long double>>& input, uint32_t size,
     }
     std::vector<std::complex<long double>> temp(size, comp(0, 0));
     for (int i = 0; i < size/2; i++) {
-        const uint32_t pos = offset + i * step;
         const uint32_t even = offset + i * step * 2;
         const uint32_t odd = even + step;
         const auto p = input[even];
