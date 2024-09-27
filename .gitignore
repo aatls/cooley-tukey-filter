@@ -2,3 +2,4 @@ ctf
 .vscode
 *.gch
 *.wav
+!test.wav
