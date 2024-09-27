@@ -11,6 +11,7 @@
 #include "./include/wavtools.hpp"
 
 #define comp(a, b) std::complex<long double>(a, b)
+#define d(msg) std::cout << msg << "\n" // for debugging
 
 // Changes the endianess of 16-bit data array
 void change_endianess_16bit(char *data, size_t bytes) {
@@ -91,6 +92,7 @@ int main(int argc, char* argv[]) {
 
     // UI
     std::cout << "Greetings!\n";
+    std::cout << "\nPLEASE NOTE that currently the program is not working correctly!\nInstead of filtering out frequencies, it amplifies them...\nTo get any interesting output from the program, select only a small band to be 'filtered out'.\nFor example, try inputs 500 0.5 & 501 0.5.\n\n";
 
     bool correct_input = false;
     uint32_t freq1, freq2;
@@ -131,9 +133,8 @@ int main(int argc, char* argv[]) {
     // Transform the sample vector to it's DFS
     fft::radix2fft(samples);
 
-    // Filter stuff HERE!!
+    // Filter dfs here
     band_cut(samples, &header, freq1, freq2, gain1, gain2);
-    // band_cut(samples, &header, header.sample_rate/2 + freq1, header.sample_rate/2 + freq2, gain1, gain2);
 
     // Inverse FFT
     fft::radix2fft(samples, true);
