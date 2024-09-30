@@ -35,10 +35,6 @@ void band_cut(std::vector<std::complex<long double>> &samples, wavtools::wav_hdr
         const long double mul = (double)bin++ / (bin2 - bin1);
         const long double real = sample.real() * (1 - mul) * gain1 + sample.real() * mul * gain2;
         const long double imag = sample.imag() * (1 - mul) * gain1 + sample.imag() * mul * gain2;
-        d("\nold:");
-        d(sample.real() << ", " << sample.imag());
-        d("new:");
-        d(real << ", " << imag);
         return comp(real, imag);
     };
     std::transform(samples.begin() + bin1, samples.begin() + bin2, samples.begin() + bin1, filter);
