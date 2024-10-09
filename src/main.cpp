@@ -7,18 +7,12 @@
 #include <cmath>
 #include <algorithm>
 
+#include "AudioFile.h"
+
 #include "./include/fft.hpp"
-#include "./include/wavtools.hpp"
 
-#define comp(a, b) std::complex<long double>(a, b)
+#define comp(a, b) std::complex<double>(a, b)
 #define d(msg) std::cout << msg << "\n" // for debugging
-
-// Changes the endianess of 16-bit data array
-void change_endianess_16bit(char *data, size_t bytes) {
-    for (int i = 0; i < bytes; i += 2) {
-        std::swap(data[i], data[i+1]);
-    }
-}
 
 /* Filters out frequencies in a given band from input Fourier series. Band cut gain will be linearly interpolated using gain1 & gain2. Parameters:
     - Fourier series
@@ -27,22 +21,22 @@ void change_endianess_16bit(char *data, size_t bytes) {
     - band cut end frequency
     - band cut gain at the start freqency (0-1)
     - band cut gain at the end frequency (0-1)*/
-void band_cut(std::vector<std::complex<long double>> &samples, wavtools::wav_hdr* header, uint32_t freq1, uint32_t freq2, double gain1, double gain2) {
-    uint32_t bin1 = freq1 * samples.size() / header->sample_rate;
-    uint32_t bin2 = freq2 * samples.size() / header->sample_rate;
-    auto filter = [gain1, gain2, bin1, bin2](auto sample){ 
+void band_cut(std::vector<std::complex<double>> &fourier_series, uint32_t sample_rate, uint32_t freq1, uint32_t freq2, double gain1, double gain2) {
+    uint32_t bin1 = freq1 * fourier_series.size() / sample_rate;
+    uint32_t bin2 = freq2 * fourier_series.size() / sample_rate;
+    auto filter = [gain1, gain2, bin1, bin2](auto complex){ 
         static uint32_t bin = 0;
-        const long double mul = (double)bin++ / (bin2 - bin1);
-        const long double real = sample.real() * (1 - mul) * gain1 + sample.real() * mul * gain2;
-        const long double imag = sample.imag() * (1 - mul) * gain1 + sample.imag() * mul * gain2;
+        const double mul = (double)bin++ / (bin2 - bin1);
+        const double real = complex.real() * (1 - mul) * gain1 + complex.real() * mul * gain2;
+        const double imag = complex.imag() * (1 - mul) * gain1 + complex.imag() * mul * gain2;
         return comp(real, imag);
     };
-    std::transform(samples.begin() + bin1, samples.begin() + bin2, samples.begin() + bin1, filter);
+    std::transform(fourier_series.begin() + bin1, fourier_series.begin() + bin2, fourier_series.begin() + bin1, filter);
 }
 
 int main(int argc, char* argv[]) {
     if (argc <= 1) {
-        std::cout << "Usage: cooley-tukey-filter infile [-o outfile]\n\tinfile & outfile must be of .wav format\n\tinfile must be 16-bit mono audio" << std::endl;
+        std::cout << "Usage: cooley-tukey-filter infile [-o outfile]\n\tinfile & outfile must be of .wav format" << std::endl;
         return 0;
     }
 
@@ -59,30 +53,12 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    FILE* infile = fopen(argv[1], "rb");
-    if (infile == nullptr) {
-        std::cout << "cannot open " << argv[1] << std::endl;
-        return 0;
-    }
-
     // Read input file to memory
-    char *data8 = nullptr;
-    wavtools::wav_hdr header;
+    AudioFile<double> audio;
+    audio.load(argv[1]);
 
-    if (wavtools::read_wav(infile, &header, &data8)) {
-        free(data8);
-        return 0;
-    }
-
-    if (header.num_channels != 1) {
+    if (audio.getNumChannels() != 1) {
         std::cout << "this program supports only mono audio" << std::endl;
-        free(data8);
-        return 0;
-    }
-
-    if (header.bits_per_sample != 16) {
-        std::cout << "this program supports only 16 bit audio" << std::endl;
-        free(data8);
         return 0;
     }
 
@@ -101,10 +77,10 @@ int main(int argc, char* argv[]) {
         std::cout << "high freq & gain: ";
         std::cin >> freq2 >> gain2;
 
-        correct_input = freq1 <= header.sample_rate && freq2 <= header.sample_rate && gain1 >= 0 && gain1 <= 1 && gain2 >= 0 && gain2 <= 1;
+        correct_input = freq1 <= audio.getSampleRate()/2 && freq2 <= audio.getSampleRate()/2 && gain1 >= 0 && gain1 <= 1 && gain2 >= 0 && gain2 <= 1;
 
         if (!correct_input) {
-            std::cout << "Freq must be between 0 and " << header.sample_rate << ". Gain must be between 0 and 1" << std::endl;
+            std::cout << "Freq must be between 0 and " << audio.getSampleRate()/2 << ". Gain must be between 0 and 1" << std::endl;
         }
     }
 
@@ -113,40 +89,30 @@ int main(int argc, char* argv[]) {
         std::swap(gain1, gain2);
     }
 
-    change_endianess_16bit(data8, header.subchunk2_size);
+    // Transform the sample vector to it's discrete Fourier series
+    auto fourier_series = fft::radix2fft(audio.samples[0]);
 
-    // Create complex vector to be filled with sample data
-    std::vector<std::complex<long double>> samples(header.subchunk2_size / 2);
-    for (int i = 0; i < header.subchunk2_size / 2; i++) {
-        samples[i] = comp(reinterpret_cast<int16_t*>(data8)[i], 0);
-    }
-    free(data8);
+    d("\nAudio transformed to Fourier series..");
 
-    // Expand the sample vector to 2^n values
-    uint32_t up = std::pow(2, std::ceil(std::log2(samples.size())));
-    samples.insert(samples.end(), up - samples.size(), comp(0, 0));
+    // Filter users freqs here
+    band_cut(fourier_series, audio.getSampleRate(), freq1, freq2, gain1, gain2);
+    band_cut(fourier_series, audio.getSampleRate(), freq1 + audio.getSampleRate()/2, freq2 + audio.getSampleRate()/2, gain1, gain2);
 
-    // Transform the sample vector to it's DFS
-    fft::radix2fft(samples);
-
-    // Filter dfs here
-    band_cut(samples, &header, freq1, freq2, gain1, gain2);
+    d("Filter applied..");
 
     // Inverse FFT
-    fft::radix2fft(samples, true);
+    auto output = fft::radix2fft_inverse(fourier_series);
 
-    // Create data array from samples
-    int16_t *data16 = (int16_t*)malloc(header.subchunk2_size);
-    for (int i = 0; i < header.subchunk2_size / 2; i++) {
-        data16[i] = (int16_t)samples[i].real();
-    }
+    d("Fourier series transformed back to audio samples..");
 
-    // Prepare data for writing out
-    change_endianess_16bit(reinterpret_cast<char*>(data16), header.subchunk2_size);
+    // Cut extra samples
+    output.resize(audio.getNumSamplesPerChannel());
 
-    wavtools::write_wav(&out_name[0], &header, reinterpret_cast<char*>(data16));
+    // Write out
+    audio.samples[0] = output;
+    audio.save("./" + out_name, AudioFileFormat::Wave);
 
-    free(data16);
+    d("Outfile written");
 
     return 0;
 }
