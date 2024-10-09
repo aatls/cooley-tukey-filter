@@ -11,8 +11,21 @@
 [5th week](./docs/weekly-report-5.md)
 
 ## Running the program
-To compile the program, navigate to the projects root directory and run
+These instructions are for Linux systems. For MacOS the instructions may be the same. CMake & Make are required for building the project.
+
+First navigate to the folder you want this project, clone the repo and navigate there
 ```
+$ git clone git@github.com:aatls/cooley-tukey-filter.git
+$ cd cooley-tukey-filter
+```
+Create a build directory and move to that directory
+```
+$ mkdir build
+$ cd build
+```
+Build
+```
+$ cmake ..
 $ make
 ```
 Then to launch the program, run
