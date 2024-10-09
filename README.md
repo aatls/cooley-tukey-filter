@@ -7,7 +7,8 @@
 [1st week](./docs/weekly-report-1.md)\
 [2st week](./docs/weekly-report-2.md)\
 [3rd week](./docs/weekly-report-3.md)\
-[4th week](./docs/weekly-report-4.md)
+[4th week](./docs/weekly-report-4.md)\
+[5yh week](./docs/weekly-report-5.md)
 
 ## Running the program
 To compile the program, navigate to the projects root directory and run
