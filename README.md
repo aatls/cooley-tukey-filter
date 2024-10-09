@@ -10,7 +10,7 @@
 [4th week](./docs/weekly-report-4.md)\
 [5th week](./docs/weekly-report-5.md)
 
-## Running the program
+## Building the program
 These instructions are for Linux systems. For MacOS the instructions may be the same. CMake & Make are required for building the project.
 
 First navigate to the folder you want this project, clone the repo and navigate there
