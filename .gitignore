@@ -3,3 +3,4 @@ ctf
 *.gch
 *.wav
 !test.wav
+build/
