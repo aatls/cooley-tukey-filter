@@ -63,8 +63,8 @@ int main(int argc, char* argv[]) {
     }
 
     // UI
-    std::cout << "Greetings!\n";
-    std::cout << "\nPLEASE NOTE that currently the program is not working correctly!\nInstead of filtering out frequencies, it amplifies them...\nTo get any interesting output from the program, select only a small band to be 'filtered out'.\nFor example, try inputs 500 0.5 & 501 0.5.\n\n";
+    std::cout << "Greetings!\n\n";
+    std::cout << "Please enter frequencies between 0 and " << audio.getSampleRate()/2 << ".\nGain must be between 0 and 1\n\n";
 
     bool correct_input = false;
     uint32_t freq1, freq2;
@@ -74,13 +74,13 @@ int main(int argc, char* argv[]) {
         std::cout << "Low freq & gain: ";
         std::cin >> freq1 >> gain1;
 
-        std::cout << "high freq & gain: ";
+        std::cout << "High freq & gain: ";
         std::cin >> freq2 >> gain2;
 
         correct_input = freq1 <= audio.getSampleRate()/2 && freq2 <= audio.getSampleRate()/2 && gain1 >= 0 && gain1 <= 1 && gain2 >= 0 && gain2 <= 1;
 
         if (!correct_input) {
-            std::cout << "Freq must be between 0 and " << audio.getSampleRate()/2 << ". Gain must be between 0 and 1" << std::endl;
+            std::cout << "\nInput out of range\n\n";
         }
     }
 
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 
     // Filter users freqs here
     band_cut(fourier_series, audio.getSampleRate(), freq1, freq2, gain1, gain2);
-    band_cut(fourier_series, audio.getSampleRate(), freq1 + audio.getSampleRate()/2, freq2 + audio.getSampleRate()/2, gain1, gain2);
+    band_cut(fourier_series, audio.getSampleRate(), audio.getSampleRate() - freq2, audio.getSampleRate() - freq1, gain1, gain2);
 
     d("Filter applied..");
 
