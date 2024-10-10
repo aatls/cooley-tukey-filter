@@ -10,9 +10,9 @@
 #define comp(a, b) std::complex<double>(a, b)
 #define d(msg) std::cout << msg << "\n" // for debugging
 
-namespace fft {
-
+namespace ctf {
 namespace details {
+
 constexpr const double PI = 3.14159265358979323846264338327950288419716939937510;
 
 // Swaps real & imaginary parts of every value in the input vector
