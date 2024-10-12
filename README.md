@@ -8,7 +8,8 @@
 [2st week](./docs/weekly-report-2.md)\
 [3rd week](./docs/weekly-report-3.md)\
 [4th week](./docs/weekly-report-4.md)\
-[5th week](./docs/weekly-report-5.md)
+[5th week](./docs/weekly-report-5.md)\
+[6th week](./docs/weekly-report-6.md)
 
 ## Building the program
 These instructions are for Linux systems. For MacOS the instructions may be the same. CMake & Make are required for building the project.
@@ -28,7 +29,11 @@ Build
 $ cmake ..
 $ make
 ```
-Then to launch the program, run
+To launch the program, run
 ```
 $ ./ctf [input file & optional arguments]
+```
+To run the tests, run
+```
+$ ./tests
 ```
