@@ -20,12 +20,12 @@ void band_cut(std::vector<std::complex<double>> &fourier_series, uint32_t sample
     };
 
     // Cut given freqs
-    for (auto bin = bin1; bin < bin2; bin++) {
+    for (auto bin = bin1; bin <= bin2; bin++) {
         fourier_series[bin] *= interpolate(bin);
     }
 
     // Cut mirrored freqs over Nyquist freq
-    for (auto bin = fourier_series.size() - bin2; bin < fourier_series.size() - bin1; bin++) {
+    for (auto bin = fourier_series.size() - bin2; bin <= fourier_series.size() - bin1; bin++) {
         fourier_series[bin] *= interpolate(bin2 - (fourier_series.size() - bin));
     }
 }
