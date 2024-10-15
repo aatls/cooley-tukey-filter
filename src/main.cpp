@@ -17,6 +17,7 @@
 
 void get_user_input(uint32_t sample_rate, uint32_t* freq1, uint32_t* freq2, double* gain1, double* gain2) {
     std::cout << "Greetings!\n\n";
+    std::cout << "NOTE that the linear interpolation feature is not working correctly! For good results, choose the same gain value for both gain inputs.\n\n";
     std::cout << "Please enter frequencies between 0 and " << sample_rate/2 << ".\nGain must be between 0 and 1\n\n";
 
     bool correct_input = false;
