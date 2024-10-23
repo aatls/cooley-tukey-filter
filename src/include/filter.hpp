@@ -63,7 +63,21 @@ void roll_off(std::vector<std::complex<double>> &fourier_series, uint32_t sample
     rm_freqs(fourier_series, sample_rate, high_roll, "lin");
 }
 
-void band_cut(std::vector<std::complex<double>> &fourier_series, uint32_t sample_rate, Band band, uint32_t roll) {
+void band_cut(std::vector<std::complex<double>> &fourier_series, uint32_t sample_rate, Band band, int roll) {
+    if (band.freq1 > sample_rate / 2 || band.freq2 > sample_rate / 2) {
+        throw std::invalid_argument("Band frequencies must be below sample rate / 2");
+    }
+    if (band.freq1 > band.freq2) {
+        throw std::invalid_argument("Low frequency must be below high frequency");
+    }
+    if (band.gain1 < 0 || band.gain1 > 1 ||
+        band.gain2 < 0 || band.gain2 > 1){
+        throw std::invalid_argument("Gain values must be between 0 & 1 inclusive");
+    }
+    if (roll < 0) {
+        throw std::invalid_argument("Roll off amount must be non-negative");
+    }
+
     rm_freqs(fourier_series, sample_rate, band);
     roll_off(fourier_series, sample_rate, band, roll);
 }
