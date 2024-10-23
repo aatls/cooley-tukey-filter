@@ -31,7 +31,12 @@ $ make
 ```
 To launch the program, run
 ```
-$ ./ctf [input file & optional arguments]
+$ ./ctf <infile.wav> [options]
+```
+To build the program with the tests, run
+```
+$ cmake -DBUILD_TESTS=ON ..
+$ make
 ```
 To run the tests, run
 ```
