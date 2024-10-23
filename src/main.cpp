@@ -75,11 +75,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (freq_bands.size() == 0 && interactive == false) {
-        std::cerr << "Give frequency bands as parameters or run in interactive mode" << std::endl;
-        return 1;
-    }
-
     if ((in_name.ends_with(".wav") == false && in_name.ends_with(".WAV") == false) ||
         (out_name.ends_with(".wav") == false && out_name.ends_with(".WAV") == false)) {
         std:: cerr << "Audio input & output files must be .wav format" << std::endl;
@@ -97,10 +92,18 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    if (freq_bands.size() == 0 && interactive == false) {
+        std::cerr << "Give frequency bands as parameters or run in interactive mode" << std::endl;
+        return 1;
+    }
+
+    if (ctf::validate_input(freq_bands, audio.getSampleRate(), roll_amount)) {
+        return 1;
+    }
+
     if (interactive) {
         freq_bands = ctf::get_user_input(audio.getSampleRate());
     }
-
     verbose_msg(verbose, "Processing..");
 
     auto fourier_series = ctf::radix2fft(audio.samples[0]);

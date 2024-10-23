@@ -72,7 +72,7 @@ void band_cut(std::vector<std::complex<double>> &fourier_series, uint32_t sample
     }
     if (band.gain1 < 0 || band.gain1 > 1 ||
         band.gain2 < 0 || band.gain2 > 1){
-        throw std::invalid_argument("Gain values must be between 0 & 1 inclusive");
+        throw std::invalid_argument("Gain values must be between 0 & 1");
     }
     if (roll < 0) {
         throw std::invalid_argument("Roll off amount must be non-negative");
