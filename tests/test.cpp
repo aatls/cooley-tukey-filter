@@ -31,27 +31,27 @@ std::vector<std::complex<double>> test_vector(sample_rate, comp(1.0,1.0));
 constexpr const ctf::Band cut_band (100, 10000, 0, 0);
 constexpr const ctf::Band partial_cut_band (100, 10000, 0.1, 0.1);
 
-TEST_CASE("Input freqs are cut" "[ctf::band_cut]") {
+TEST_CASE("Input freqs are cut" "[ctf::rm_freqs]") {
     auto filtered(test_vector);
-    ctf::band_cut(filtered, sample_rate, cut_band);
+    ctf::rm_freqs(filtered, sample_rate, cut_band);
 
     for (uint32_t i = cut_band.freq1; i <= cut_band.freq2; i++) {
         REQUIRE(close_enough(filtered[i], comp(0,0)));
     }
 }
 
-TEST_CASE("Mirrored freqs are cut" "[ctf::band_cut]") {
+TEST_CASE("Mirrored freqs are cut" "[ctf::rm_freqs]") {
     auto filtered(test_vector);
-    ctf::band_cut(filtered, sample_rate, cut_band);
+    ctf::rm_freqs(filtered, sample_rate, cut_band);
 
     for (uint32_t i = sample_rate - cut_band.freq2; i <= sample_rate - cut_band.freq1; i++) {
         REQUIRE(close_enough(filtered[i], comp(0,0)));
     }
 }
 
-TEST_CASE("Outside freqs are untouched" "[ctf::band_cut]") {
+TEST_CASE("Outside freqs are untouched" "[ctf::rm_freqs]") {
     auto filtered(test_vector);
-    ctf::band_cut(filtered, sample_rate, cut_band);
+    ctf::rm_freqs(filtered, sample_rate, cut_band);
 
     for (uint32_t i = 0; i < filtered.size(); i++) {
         if ((i < cut_band.freq1 && i > cut_band.freq2) && (i < sample_rate - cut_band.freq2 && i > sample_rate - cut_band.freq1)) {
@@ -60,9 +60,9 @@ TEST_CASE("Outside freqs are untouched" "[ctf::band_cut]") {
     }
 }
 
-TEST_CASE("Gain reducing works" "[ctf::band_cut]") {
+TEST_CASE("Gain reducing works" "[ctf::rm_freqs]") {
     auto filtered(test_vector);
-    ctf::band_cut(filtered, sample_rate, partial_cut_band);
+    ctf::rm_freqs(filtered, sample_rate, partial_cut_band);
 
     for(uint32_t i = partial_cut_band.freq1; i <= partial_cut_band.freq2; i++) {
         REQUIRE(close_enough(filtered[i], comp(partial_cut_band.gain1, partial_cut_band.gain2)));

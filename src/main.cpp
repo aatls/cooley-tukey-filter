@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
     if (argc <= 1) {
         std::cout << "Usage: ctf infile.wav [options]\n"
                      "\t-o <filename.wav> for user defined output filename (defaults to out.wav)\n"
+                     "\t-r <amount> to set cutoff roll off amount in hertz (defaults to 50)\n"
                      "\t-v to run in verbose mode"<< std::endl;
         return 0;
     }
@@ -29,23 +30,33 @@ int main(int argc, char* argv[]) {
     std::string out_name = "out.wav";
 
     bool verbose = false;
+    int roll_amount = 50;
 
     std::string arg;
 
     for (int i = 2; i < argc; i++) {
         arg = argv[i];
 
-        if (arg.compare("-o") == 0) {
+        if (arg == "-o") {
             out_name = argv[++i];
-        } else if (arg.compare("-v") == 0) {
+        } else if (arg == "-v") {
             verbose = true;
+        } else if (arg == "-r") {
+            int roll_input = std::stoi(argv[++i]);
+
+            if (roll_input < 0) {
+                std::cerr << "Roll off value should be non-negative" << std::endl;
+                return 1;
+            }
+
+            roll_amount = roll_input;
         }
     }
 
     if ((in_name.ends_with(".wav") == false && in_name.ends_with(".WAV") == false) ||
         (out_name.ends_with(".wav") == false && out_name.ends_with(".WAV") == false)) {
-        std:: cout << "Audio input & output files must be .wav format" << std::endl;
-        return 0;
+        std:: cerr << "Audio input & output files must be .wav format" << std::endl;
+        return 1;
     }
 
     AudioFile<double> audio;
@@ -66,7 +77,7 @@ int main(int argc, char* argv[]) {
     verbose_msg(verbose, "Audio transformed to Fourier series..");
 
     for (const auto& band : freq_bands) {
-        ctf::band_cut(fourier_series, audio.getSampleRate(), band);
+        ctf::band_cut(fourier_series, audio.getSampleRate(), band, roll_amount);
     }
     verbose_msg(verbose, "Filter applied..");
 
