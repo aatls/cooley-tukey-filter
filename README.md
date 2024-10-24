@@ -31,7 +31,7 @@ $ make
 ```
 To launch the program, run
 ```
-$ ./ctf <infile.wav> [options]
+$ ./ctf
 ```
 To build the program with the tests, run
 ```

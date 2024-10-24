@@ -18,7 +18,7 @@ void verbose_msg(const bool verbose, const std::string msg) {
 }
 
 void print_usage() {
-    std::cout << "Usage: ctf infile.wav [freq bands] [options]\n"
+    std::cout << "Usage: ctf <infile.wav> [freq bands] [options]\n"
         "\nFreq bands:\n"
         "\tIn non-interactive mode (default), give frequency bands to be filtered out\n"
         "\tin the following format: <band(low-frequency low-gain high-frequency high-gain)>\n"
