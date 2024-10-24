@@ -5,6 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 option(BUILD_TESTS "Build tests" OFF)
+option(OPTIMIZE "Set optimization flags on" ON)
+
+if(OPTIMIZE)
+    set(CMAKE_CXX_FLAGS "-O2")
+endif(OPTIMIZE)
 
 # Build main program
 add_executable(ctf src/main.cpp)
