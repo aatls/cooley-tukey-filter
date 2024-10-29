@@ -1,10 +1,12 @@
 # Setup
 cmake_minimum_required(VERSION 3.10)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake-modules")
 project(CooleyTukeyFilter)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 option(BUILD_TESTS "Build tests" OFF)
+option(ADD_COVERAGE "Add code coverage report" OFF)
 option(OPTIMIZE "Set optimization flags on" ON)
 
 if(OPTIMIZE)
@@ -13,7 +15,7 @@ endif(OPTIMIZE)
 
 # Build main program
 add_executable(ctf src/main.cpp)
-target_include_directories(ctf PUBLIC ${PROJECT_SOURCE_DIR}/src/include)
+target_include_directories(ctf PUBLIC "${PROJECT_SOURCE_DIR}/src/include")
 
 include(FetchContent)
 
@@ -44,3 +46,16 @@ if(BUILD_TESTS)
     
     list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 endif(BUILD_TESTS)
+
+if(ADD_COVERAGE)
+    include(CodeCoverage)
+    append_coverage_compiler_flags_to_target(tests)
+    set(COVERAGE_EXCLUDES
+        "${PROJECT_SOURCE_DIR}/build"
+        "${PROJECT_SOURCE_DIR}/tests")
+    setup_target_for_coverage_gcovr_html(
+        NAME ctf_coverage
+        EXECUTABLE tests
+        DEPENDENCIES tests
+        )
+endif(ADD_COVERAGE)
