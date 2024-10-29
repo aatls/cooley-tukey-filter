@@ -69,6 +69,73 @@ TEST_CASE("Gain reducing works" "[ctf::rm_freqs]") {
     }
 }
 
+TEST_CASE("Roll-off works" "[ctf::roll_off]") {
+    auto rolled(test_vector);
+    constexpr const int f1 = 1000, f2 = 2000, roll = 500;
+    constexpr const double g1 = 0, g2 = 0.5;
+    const ctf::Band band (f1, f2, g1, g2);
+
+    ctf::roll_off(rolled, sample_rate, band, roll);
+
+    // Before 1st roll
+    for (int i = 1; i < f1 - roll; i++) {
+        const auto corr = comp(1, 1);
+
+        REQUIRE(close_enough(rolled[i], corr));
+        REQUIRE(close_enough(rolled[sample_rate - i], corr));
+    }
+    // 1st roll
+    for (int i = f1 - roll + 1; i < f1; i++) {
+        const double correct_gain = 1 - (f1 - i) / roll;
+        const auto corr = comp(correct_gain, correct_gain);
+
+        REQUIRE(close_enough(rolled[i], corr));
+        REQUIRE(close_enough(rolled[sample_rate - i], corr));
+    }
+    // Before 2nd roll
+    for (int i = f1 + 1; i < f2; i++) {
+        const auto corr = comp(1, 1);
+
+        REQUIRE(close_enough(rolled[i], corr));
+        REQUIRE(close_enough(rolled[sample_rate - i], corr));
+    }
+    // 2nd roll
+    for (int i = f2; i < f2 + roll; i++) {
+        const double correct_gain =  1 - g2 * (f2 - i) / roll;
+        const auto corr = comp(correct_gain, correct_gain);
+
+        REQUIRE(close_enough(rolled[i], corr));
+        REQUIRE(close_enough(rolled[sample_rate - i], corr));
+    }
+    // After 2nd roll
+    for (int i = f2 + roll; i < sample_rate / 2; i++) {
+        const auto corr = comp(1, 1);
+
+        REQUIRE(close_enough(rolled[i], corr));
+        REQUIRE(close_enough(rolled[sample_rate - i], corr));
+    }
+}
+
+TEST_CASE("Band-cut argument validation" "[ctf::band_cut]") {
+    auto test_v(test_vector);
+    ctf::Band test_b;
+
+    test_b = ctf::Band(0, 30000, 0, 0);
+    REQUIRE_THROWS(ctf::band_cut(test_v, sample_rate, test_b, 0));
+
+    test_b = ctf::Band(1000, 500, 0, 0);
+    REQUIRE_THROWS(ctf::band_cut(test_v, sample_rate, test_b, 0));
+
+    test_b = ctf::Band(0, 1, -1, 0);
+    REQUIRE_THROWS(ctf::band_cut(test_v, sample_rate, test_b, 0));
+
+    test_b = ctf::Band(0, 1, 0, 2);
+    REQUIRE_THROWS(ctf::band_cut(test_v, sample_rate, test_b, 0));
+
+    test_b = ctf::Band(0, 1, 0, 0);
+    REQUIRE_THROWS(ctf::band_cut(test_v, sample_rate, test_b, -1));
+}
+
 // --------------------- TEST FFT --------------------
 
 TEST_CASE("Flip-all utility works" "[ctf::details::flip_all]") {
@@ -136,3 +203,7 @@ TEST_CASE("FFT goes around" "[ctf::radix2fft][ctf::radix2fft_inverse]") {
         REQUIRE(close_enough(original[i], transformed[i]));
     }
 }
+
+// --------------------- TEST IO --------------------
+
+// do that
