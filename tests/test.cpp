@@ -2,7 +2,7 @@
 #include <complex>
 #include <cstdlib>
 #include <random>
-#include <iostream> // debugging
+#include <cmath>
 
 // Testing framework
 #define CATCH_CONFIG_MAIN
@@ -14,8 +14,8 @@
 #define comp(a, b) std::complex<double>(a, b)
 
 // Utility functions
-bool close_enough(double d1, double d2) {
-    return abs(d1 - d2) < 1e-9;
+bool close_enough(double d1, double d2, double e=1e-9) {
+    return abs(d1 - d2) < e;
 }
 
 bool close_enough(std::complex<double> c1, std::complex<double> c2) {
@@ -204,6 +204,25 @@ TEST_CASE("FFT goes around" "[ctf::radix2fft][ctf::radix2fft_inverse]") {
     }
 }
 
-// --------------------- TEST IO --------------------
+TEST_CASE("Frequency removal" "[ctf::radix2fft][ctf::radix2fft_inverse][ctf::band_cut]") {
+    std::vector<double> sine440(sample_rate);
+    std::vector<double> sine1000(sample_rate);
+    
+    for (int i = 0; i < sample_rate; i++) {
+        sine440[i] = sin(440.0 * i / sample_rate);
+        sine1000[i] = sin(1000.0 * i / sample_rate);
+    }
 
-// do that
+    std::vector<double> sine_sum(sample_rate);
+    std::transform(sine440.begin(), sine440.end(), sine1000.begin(), sine_sum.begin(), std::plus<double>());
+
+    auto transform = ctf::radix2fft(sine_sum);
+    ctf::Band cut_1000(900, 1100, 0, 0);
+    ctf::band_cut(transform, sample_rate, cut_1000, 100);
+    auto result = ctf::radix2fft_inverse(transform);
+
+    // Skip the first 50 000 samples since there are some artefacts
+    for (int i = 50000; i < sample_rate - 50000; i++) {
+        REQUIRE(close_enough(result[i], sine440[i]));
+    }
+}
