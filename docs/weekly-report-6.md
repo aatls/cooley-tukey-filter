@@ -8,8 +8,8 @@ Used time this week ~17h
   * That using external libraries especially on projects that have deadlines is very helpful.
   * To use CMake & pull libraries from github.
   * To create unit tests with Catch2
-  * That the problem in my project was that I processed the 16-bit audio data without scaling it to values between 0 & 1. Then when I applied FFT, the values propably got too large and introduced unexpected behaviour.
-- I had some troubles with VSCode since IntelliSense does not recognize Catch2. It slows down my workflow but is not too important issue. Also CMake instructions are a bit mysterious still since I haven't had time to get too familiar with it.
+  * That the problem in my project was that I processed the 16-bit audio data without scaling it to values between 0 & 1. Then when I applied FFT, the values probably got too large and introduced unexpected behaviour.
+- I had some troubles with VSCode since IntelliSense does not recognize Catch2. It slows down my workflow but is not too important of an issue. Also, CMake instructions are a bit mysterious still since I haven't had time to get too familiar with it.
 - Next week I'll:
   * Create the rest of the unit tests.
   * Implement an option to filter multiple frequency ranges at once.
