@@ -31,7 +31,6 @@ void dft_naive(std::vector<std::complex<double>>& input) {
 }
 
 void radix2fft_rec(std::vector<std::complex<double>>& input, uint32_t size, uint32_t offset=0, uint32_t step=1) {
-
     if (size == 1) return;
 
     // Calculate the two halves recursively
@@ -84,7 +83,12 @@ std::vector<double> radix2fft_inverse(std::vector<std::complex<double>>& fourier
     // Use a trick to calculate the inverse Fourier transform
     details::flip_all(fourier_series);
     details::radix2fft_rec(fourier_series, fourier_series.size());
-    std::transform(fourier_series.begin(), fourier_series.end(), fourier_series.begin(), [fourier_series](auto val){ return val / comp(fourier_series.size(), 0); }); // Don't know why this has to be done..
+    std::transform(fourier_series.begin(),
+                fourier_series.end(), 
+                fourier_series.begin(),
+                [fourier_series](auto val){
+                    return val / comp(fourier_series.size(), 0);  // Don't know why this has to be done..
+                });
     details::flip_all(fourier_series);
 
     std::vector<double> output_samples;
