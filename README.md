@@ -11,7 +11,8 @@ Testing document coming soon..
 [3rd week](./docs/weekly-report-3.md)\
 [4th week](./docs/weekly-report-4.md)\
 [5th week](./docs/weekly-report-5.md)\
-[6th week](./docs/weekly-report-6.md)
+[6th week](./docs/weekly-report-6.md)\
+Final report coming soon..
 
 ## Building the program
 These instructions are for Linux systems. For MacOS the instructions may be the same. CMake & Make are required for building the project.
