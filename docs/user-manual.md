@@ -36,4 +36,4 @@ Overlapping of frequency bands is not checked. All overlapping bands are applied
 - -r &lt;amount&gt; to set frequency cut roll off amount in hertz (defaults to 50)
 - -i to run in interactive mode
 - -v to run in verbose mode
-- -h print this help message
+- -h to print this help message
