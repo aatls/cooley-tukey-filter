@@ -3,6 +3,7 @@
 ## Docs
 [Specification document](./docs/specification-document.md)\
 [User manual](./docs/user-manual.md)\
+Implementation document coming soon..\
 Testing document coming soon..
 
 ## Weekly reports
